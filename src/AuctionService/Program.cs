@@ -1,3 +1,4 @@
+using System.Numerics;
 using AuctionService;
 using AuctionService.Data;
 using MassTransit;
@@ -57,6 +58,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
     });
 
+builder.Services.AddGrpc();
 var app = builder.Build();
 
 
@@ -106,6 +108,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<GrpcAuctionService>();
 app.Run();
 
 
