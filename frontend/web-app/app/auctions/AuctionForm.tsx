@@ -6,8 +6,8 @@ import Input from '../components/Input';
 import DateInput from '../components/DateInput';
 import { createAuction, updateAuction } from '../actions/auctionActions';
 import { usePathname, useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
 import { Auction } from '../types';
+import toast from 'react-hot-toast';
 
 type Props = {
     auction?: Auction
@@ -27,7 +27,7 @@ export default function AuctionForm({auction}:Props) {
         reset({make, model, color, mileage,year});
     }
     setFocus('make');
-  },[setFocus])
+  },[setFocus, reset, auction])
 
   async function onSubmit(data: FieldValues){
     // console.log(data);

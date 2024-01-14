@@ -4,6 +4,8 @@ using AuctionService.Data;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,12 @@ builder.Services.AddMassTransit( x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
+        cfg.UseMessageRetry(r =>
+        {
+            r.Handle<RabbitMqConnectionException>();
+            r.Interval(5, TimeSpan.FromSeconds(10));
+        });
+
         cfg.ConfigureEndpoints(context);
 
         cfg.Host(builder.Configuration["RabbitMq:Host"],"/", host =>
@@ -57,6 +65,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
     });
+
+builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
 
 builder.Services.AddGrpc();
 var app = builder.Build();
@@ -95,6 +105,8 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast");
 //.WithOpenApi();
 
+// Removed because of Polly
+/*
 try
 {
     DbInitializer.InitDb(app);
@@ -103,15 +115,22 @@ catch (Exception e)
 {
     Console.WriteLine(e);
 }
+*/
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 app.MapGrpcService<GrpcAuctionService>();
+
+var retryPolicy = Policy
+    .Handle<NpgsqlException>()
+    .WaitAndRetry(5, retryAttemp => TimeSpan.FromSeconds(10));
 app.Run();
 
+retryPolicy.ExecuteAndCapture(() => DbInitializer.InitDb(app));
 
+public partial class Program {}
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string Summary)
 {

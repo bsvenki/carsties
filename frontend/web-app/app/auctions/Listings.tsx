@@ -4,11 +4,11 @@ import Auctioncard from './Auctioncard';
 import AppPagination from '../components/AppPagination';
 import { getData } from '../actions/auctionActions';
 import Filters from './Filters';
-import {shallow} from 'zustand/shallow';
 import { useParamsStore } from '@/hooks/useParamStore';
 import qs from 'query-string';
 import EmptyFilter from '../components/EmptyFilter';
 import { useAuctionStore } from '@/hooks/useAuctionStore';
+import { shallow } from 'zustand/shallow';
 
 
 export default  function Listings() {
@@ -58,7 +58,7 @@ export default  function Listings() {
       setLoading(false);
 
     })
-  }, [url])
+  }, [url, setData])
 
   //if(!data) return <h3>loading...</h3>
   if(loading) return <h3>loading...</h3>

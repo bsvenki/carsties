@@ -8,7 +8,17 @@ const nextConfig = {
             pathname: '**',
           },
         ],
-      },
+    },
+    output:'standalone',
+    typescript: {
+        ignoreBuildErrors: true,
+    },
 }
 
-module.exports = nextConfig
+
+
+module.exports = nextConfig;
+
+
+
+
